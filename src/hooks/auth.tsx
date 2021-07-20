@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../services/api';
+import AppointmentCreated from '../pages/AppointmentCreated';
 
 interface SignInCredentials {
   email: string;
@@ -51,7 +52,12 @@ const AuthProvider: React.FC = ({ children }) => {
         '@GoBarber:user',
       ]);
 
+      // setando o token de autenticação no cabeçalho da requisição
+      api.defaults.headers.authorization = `Bearer ${token}`;
+
       if (token[1] && user[1]) {
+        // setando o token de autenticação no cabeçalho da requisição
+        api.defaults.headers.authorization = `Bearer ${token[1]}`;
         setData({ token: token[1], user: JSON.parse(user[1]) });
       }
 
