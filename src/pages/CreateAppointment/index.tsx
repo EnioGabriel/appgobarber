@@ -24,6 +24,8 @@ import {
   OpenDatePickerButton,
   OpenDatePickerButtonText,
   Schedule,
+  CreateAppointmentButton,
+  CreateAppointmentButtonText,
   Section,
   SectionTitle,
   SectionContent,
@@ -32,7 +34,7 @@ import {
 } from './styles';
 
 import api from '../../services/api';
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 
 interface RouteParams {
   providerId: string;
@@ -52,7 +54,7 @@ interface AvailabilityItem {
 const CreateAppointment: React.FC = () => {
   const { user } = useAuth();
   const route = useRoute();
-  const { goBack } = useNavigation();
+  const { goBack, navigate } = useNavigation();
 
   const routeParams = route.params as RouteParams;
 
@@ -65,6 +67,7 @@ const CreateAppointment: React.FC = () => {
   );
   const [providers, setProviders] = useState([]);
 
+  //useEffect: são usados em chamada de api
   useEffect(() => {
     api.get('providers').then((response) => {
       setProviders(response.data);
@@ -115,6 +118,31 @@ const CreateAppointment: React.FC = () => {
     [],
   );
 
+  const handleCreateAppointment = useCallback(async () => {
+    try {
+      const date = new Date(selectedDate);
+
+      date.setHours(selectedHour);
+      date.setMinutes(0);
+
+      // 1° param: rota
+      // 2° param: dados que estou enviando
+      await api.post('appointments', {
+        provider_id: selectedProvider,
+        date,
+      });
+
+      // 1° param: tela que vou entrar
+      // 2° param: data que o usuário agendou em formato timestamp
+      navigate('AppointmentCreated', { date: date.getTime() });
+    } catch (error) {
+      Alert.alert(
+        'Erro ao criar agendamento',
+        'Ocorreu um erro ao tentar criar o agendamento, tente novamente',
+      );
+    }
+  }, [navigate, selectedDate, selectedHour, selectedProvider]);
+
   const morningAvailability = useMemo(() => {
     return availability
       .filter(({ hour }) => hour < 12)
@@ -159,8 +187,8 @@ const CreateAppointment: React.FC = () => {
             data={providers}
             keyExtractor={(provider) => provider.id}
             renderItem={({ item: provider }) => (
-              // () =>:  sempre passa cria uma arrow function qnd a função passa algo por parametro
               <ProviderContainer
+                // () =>:  sempre criar uma arrow function qnd a função passa algo por parametro
                 onPress={() => handleSelectProvider(provider.id)}
                 selected={provider.id === selectedProvider}
               >
@@ -236,6 +264,10 @@ const CreateAppointment: React.FC = () => {
             </SectionContent>
           </Section>
         </Schedule>
+
+        <CreateAppointmentButton onPress={handleCreateAppointment}>
+          <CreateAppointmentButtonText>Agendar</CreateAppointmentButtonText>
+        </CreateAppointmentButton>
       </Content>
     </Container>
   );
