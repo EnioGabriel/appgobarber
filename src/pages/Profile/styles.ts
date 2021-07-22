@@ -14,6 +14,7 @@ export const Title = styled.Text`
   font-family: 'RobotoSlab-Medium';
   margin: 24px 0;
 `;
+
 export const BackButton = styled.TouchableOpacity`
   margin-top: 40px;
 `;

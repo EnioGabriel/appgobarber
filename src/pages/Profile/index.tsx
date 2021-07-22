@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
@@ -128,8 +129,44 @@ const Profile: React.FC = () => {
         );
       }
     },
-    [navigation],
+    [navigation, updateUser],
   );
+
+  const handleUpdateAvatar = useCallback(() => {
+    launchImageLibrary({ mediaType: 'photo' }, async (response) => {
+      if (response.didCancel) {
+        return;
+      }
+
+      if (response.errorCode === 'camera_unavailable') {
+        Alert.alert('Camera não disponível');
+        return;
+      }
+
+      if (response.errorCode === 'permission') {
+        Alert.alert('Permissão negada', 'Você precisa liberar permissão');
+        return;
+      }
+
+      if (response.errorMessage) {
+        Alert.alert('Erro ao atualizar seu avatar');
+        return;
+      }
+
+      const data = new FormData();
+
+      data.append('avatar', {
+        type: 'image/jpeg',
+        name: `${user.id}.jpg`,
+        // @ts-ignore: Object is possibly 'null'.
+        uri: response.assets[0].uri,
+      });
+
+      api.patch('/users/avatar', data).then((apiResponse) => {
+        updateUser(apiResponse.data);
+      });
+    });
+  }, [updateUser, user.id]);
 
   const handleGoBack = useCallback(() => {
     navigation.goBack();
@@ -151,7 +188,7 @@ const Profile: React.FC = () => {
               <Icon name="chevron-left" size={24} color="#999591" />
             </BackButton>
 
-            <UserAvatarButton onPress={() => {}}>
+            <UserAvatarButton onPress={handleUpdateAvatar}>
               <UserAvatar source={{ uri: user.avatar_url }}></UserAvatar>
             </UserAvatarButton>
             {/* corrigindo bug de animação qnd abre o teclado */}
