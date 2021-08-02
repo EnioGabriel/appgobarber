@@ -6,6 +6,17 @@
 
 Aplicativo mobile para agendar serviços de barbearia, onde usuários poderão marcar agendamentos com prestadores (gerenciados na [parte web](https://github.com/EnioGabriel/GoBarberWeb)).
 
+### Telas do projeto
+- Telas de cadastro e login:
+<p align="center">
+  <img align="center" alt="GIF" src="https://media.giphy.com/media/jsCoZUQcU6XV33xPOz/giphy.gif"  />
+</p>
+
+- Telas perfil e agendamento:
+<p align="center">
+  <img align="center" alt="GIF" src="https://media.giphy.com/media/5cml5iZ1gtTvX3VfLl/giphy.gif"  />
+</p>
+
 ### Tecnologias utilizadas
 
 O projeto foi feito com as seguintes tecnologias:
